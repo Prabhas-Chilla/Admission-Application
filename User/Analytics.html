@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Analytics - Admission Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    h2 {
+      color: #333;
+    }
+    .card {
+      background-color: #f5f5f5;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 20px;
+    }
+    #chartContainer {
+      max-width: 600px;
+      margin: auto;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>📊 Analytics Dashboard</h2>
+
+  <div class="card">
+    <strong>Total Applications:</strong> <span id="totalApps">0</span><br>
+    <strong>Today's Applications:</strong> <span id="todayApps">0</span><br>
+    <strong>Most Chosen Course:</strong> <span id="topCourse">-</span>
+  </div>
+
+  <div class="card" id="chartContainer">
+    <canvas id="weeklyChart"></canvas>
+  </div>
+
+  <script>
+    
+    const data = JSON.parse(localStorage.getItem('applications')) || [];
+
+   
+    document.getElementById("totalApps").textContent = data.length;
+
+    const today = new Date().toISOString().slice(0, 10);
+    const todayApps = data.filter(app => app.timeSubmitted.startsWith(today));
+    document.getElementById("todayApps").textContent = todayApps.length;
+
+ 
+    const courseCount = {};
+    data.forEach(app => {
+      courseCount[app.course] = (courseCount[app.course] || 0) + 1;
+    });
+    const topCourse = Object.keys(courseCount).reduce((a, b) => courseCount[a] > courseCount[b] ? a : b, "-");
+    document.getElementById("topCourse").textContent = topCourse;
+
+    // Weekly Chart
+    const last7Days = [...Array(7)].map((_, i) => {
+      const date = new Date();
+      date.setDate(date.getDate() - i);
+      return date.toISOString().slice(0, 10);
+    }).reverse();
+
+    const chartData = last7Days.map(day =>
+      data.filter(app => app.timeSubmitted.startsWith(day)).length
+    );
+
+    new Chart(document.getElementById("weeklyChart"), {
+      type: 'bar',
+      data: {
+        labels: last7Days,
+        datasets: [{
+          label: 'Applications per Day',
+          data: chartData,
+          backgroundColor: '#3e95cd'
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: false },
+          title: {
+            display: true,
+            text: 'Applications Over the Last 7 Days'
+          }
+        }
+      }
+    });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f5f5f5;
+    }
+    .navbar {
+      background-color: #333;
+      color: white;
+      padding: 10px;
+      display: flex;
+      justify-content: space-around;
+    }
+    .navbar button {
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    .section {
+      display: none;
+      padding: 20px;
+    }
+    .active {
+      display: block;
+    }
+    table, th, td {
+      border: 1px solid #ddd;
+      border-collapse: collapse;
+      padding: 8px;
+    }
+    table {
+      width: 100%;
+      margin-top: 10px;
+    }
+    .form-group {
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="navbar">
+    <button onclick="showSection('verify')">Verify Applications</button>
+    <button onclick="showSection('manage')">Manage Courses</button>
+  </div>
+
+  
+  <div id="verify" class="section">
+    <h2>Approved / Reject Applications</h2>
+    <div id="applicationList"></div>
+  </div>
+
+ 
+  <div id="manage" class="section">
+    <h2>Manage Courses / Branches</h2>
+    <div>
+      <h3>Add Program</h3>
+      <input type="text" id="programInput" placeholder="Program name" />
+      <button onclick="addProgram()">Add Program</button>
+
+      <h3>Programs</h3>
+      <div id="programList"></div>
+    </div>
+  </div>
+
+  <script>
+    function showSection(id) {
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+    }
+
+    // Sample localStorage mock data
+    const applications = JSON.parse(localStorage.getItem('applications') || '[]');
+
+    function renderApplications() {
+      const container = document.getElementById('applicationList');
+      if (applications.length === 0) {
+        container.innerHTML = '<p>No applications found.</p>';
+        return;
+      }
+      container.innerHTML = applications.map((app, i) => `
+        <div style="border:1px solid #ccc; padding:10px; margin:10px 0;">
+          <p><strong>Name:</strong> ${app.name}</p>
+          <p><strong>App ID:</strong> ${app.appid}</p>
+          <p><strong>Time:</strong> ${app.time}</p>
+          <p><strong>Status:</strong> ${app.status || 'Pending'}</p>
+          <textarea placeholder="Add remarks..." id="remark-${i}">${app.remark || ''}</textarea><br/>
+          <button onclick="updateStatus(${i}, 'Approved')">Approve</button>
+          <button onclick="updateStatus(${i}, 'Rejected')">Reject</button>
+        </div>
+      `).join('');
+    }
+
+    function updateStatus(index, status) {
+      const remark = document.getElementById(`remark-${index}`).value;
+      applications[index].status = status;
+      applications[index].remark = remark;
+      localStorage.setItem('applications', JSON.stringify(applications));
+      renderApplications();
+    }
+
+    // Courses and Branches
+    let programs = JSON.parse(localStorage.getItem('programs') || '[]');
+
+    function addProgram() {
+      const program = document.getElementById('programInput').value.trim();
+      if (program && !programs.find(p => p.name === program)) {
+        programs.push({ name: program, branches: [] });
+        localStorage.setItem('programs', JSON.stringify(programs));
+        renderPrograms();
+      }
+    }
+
+    function addBranch(programIndex) {
+      const branchInput = document.getElementById(`branchInput-${programIndex}`);
+      const branch = branchInput.value.trim();
+      if (branch && !programs[programIndex].branches.includes(branch)) {
+        programs[programIndex].branches.push(branch);
+        localStorage.setItem('programs', JSON.stringify(programs));
+        renderPrograms();
+      }
+    }
+
+    function deleteBranch(programIndex, branchIndex) {
+      programs[programIndex].branches.splice(branchIndex, 1);
+      localStorage.setItem('programs', JSON.stringify(programs));
+      renderPrograms();
+    }
+
+    function renderPrograms() {
+      const container = document.getElementById('programList');
+      container.innerHTML = programs.map((p, i) => `
+        <div style="margin-bottom:15px;">
+          <h4>${p.name}</h4>
+          <input type="text" id="branchInput-${i}" placeholder="New Branch" />
+          <button onclick="addBranch(${i})">Add Branch</button>
+          <ul>
+            ${p.branches.map((b, j) => `<li>${b} <button onclick="deleteBranch(${i}, ${j})">❌</button></li>`).join('')}
+          </ul>
+        </div>
+      `).join('');
+    }
+
+    // Initial Load
+    renderApplications();
+    renderPrograms();
+    showSection('verify');
+  </script>
+</body>
+</html>
