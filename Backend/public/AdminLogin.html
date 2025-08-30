@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Login ‑ Admission Portal</title>
+
+ 
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    
+    .login-wrapper {
+      max-width: 420px;
+      margin: 8rem auto;
+      background: rgba(255,255,255,0.9);
+      padding: 2rem 2.5rem;
+      border-radius: 0.75rem;
+      box-shadow: 0 8px 18px rgba(0,0,0,0.15);
+    }
+    .login-wrapper h2 { margin-bottom: 1.2rem; text-align: center; }
+    .login-wrapper label { display:block; margin:0.8rem 0 0.25rem; }
+    .login-wrapper input {
+      width:100%; padding:0.55rem 0.7rem;
+      border:1px solid #ccc; border-radius:0.35rem;
+    }
+    .login-wrapper button {
+      width:100%; margin-top:1.2rem; padding:0.65rem;
+      border:none; border-radius:0.35rem; font-weight:600;
+      cursor:pointer;
+    }
+  </style>
+</head>
+<body>
+    <header class="navbar">
+ <div class="logo"><svg fill="none" width="10vh" height="5vh" viewBox="0 0 35 35" class="browserSupportLogo" xmlns="http://www.w3.org/2000/svg"><path fill="#F55533" fill-rule="evenodd" clip-rule="evenodd" d="M35 0H0V15.4412C0 23.1899 4.78063 30.1364 12.0191 32.905L17.5 35L22.9809 32.905C30.2194 30.1364 35 23.1899 35 15.4412V0ZM24.7059 12.3529C24.7059 16.3319 21.4797 19.5588 17.5 19.5588C13.5203 19.5588 10.2941 16.3319 10.2941 12.3529C10.2941 8.37402 13.5203 5.14706 17.5 5.14706H24.7059V12.3529ZM17.5 15.4412C19.2056 15.4412 20.5882 14.0579 20.5882 12.3529C20.5882 10.648 19.2056 9.26471 17.5 9.26471C15.7944 9.26471 14.4118 10.648 14.4118 12.3529C14.4118 14.0579 15.7944 15.4412 17.5 15.4412ZM10.2941 25.7353C10.2941 23.4613 12.1377 21.6176 14.4118 21.6176H24.7059C24.7059 23.8916 22.8623 25.7353 20.5882 25.7353H10.2941Z"></path></svg>
+      GRADIOUS Admin  </div>
+    <nav class="nav-links">
+      <a href="Home.html">Home</a>
+      <a href="Settings.html">Settings</a>
+      <a href="Home.html">Logout</a>
+    </nav>
+  </header>
+  <div class="login-wrapper">
+    <h2>Admin Login</h2>
+    <form id="adminLoginForm">
+      <label for="adminEmail">Email</label>
+      <input type="email" id="adminEmail" required />
+
+      <label for="adminPass">Password</label>
+      <input type="password" id="adminPass" required />
+
+      <button type="submit">Login</button>
+    </form>
+  </div>
+
+  <script>
+document.getElementById("adminLoginForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  
+  const email = document.getElementById("adminEmail").value.trim();
+  const password = document.getElementById("adminPass").value.trim();
+
+  try {
+    const res = await fetch("http://localhost:5000/api/auth/admin-login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password })
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      alert(data.message);
+      // Redirect to Admin Dashboard
+      window.location.href = "AdminDashboard.html";
+    } else {
+      alert(data.message || "Invalid credentials");
+    }
+  } catch (err) {
+    console.error(err);
+    alert("Server error. Try again later.");
+  }
+});
+</script>
+
+</body>
+</html>

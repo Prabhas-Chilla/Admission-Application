@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Settings - Admission Dashboard</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background-color: #f9f9f9;
+      color: #333;
+    }
+    h2 {
+      margin-bottom: 20px;
+    }
+    .setting {
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin-bottom: 8px;
+    }
+    select, input[type="text"] {
+      padding: 6px;
+      width: 250px;
+    }
+    button {
+      padding: 8px 16px;
+      background-color: #1976d2;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    button:hover {
+      background-color: #0d47a1;
+    }
+    #status {
+      color: green;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+<div class="logo"><svg fill="none" width="10vh" height="5vh" viewBox="0 0 35 35" class="browserSupportLogo" xmlns="http://www.w3.org/2000/svg"><path fill="#F55533" fill-rule="evenodd" clip-rule="evenodd" d="M35 0H0V15.4412C0 23.1899 4.78063 30.1364 12.0191 32.905L17.5 35L22.9809 32.905C30.2194 30.1364 35 23.1899 35 15.4412V0ZM24.7059 12.3529C24.7059 16.3319 21.4797 19.5588 17.5 19.5588C13.5203 19.5588 10.2941 16.3319 10.2941 12.3529C10.2941 8.37402 13.5203 5.14706 17.5 5.14706H24.7059V12.3529ZM17.5 15.4412C19.2056 15.4412 20.5882 14.0579 20.5882 12.3529C20.5882 10.648 19.2056 9.26471 17.5 9.26471C15.7944 9.26471 14.4118 10.648 14.4118 12.3529C14.4118 14.0579 15.7944 15.4412 17.5 15.4412ZM10.2941 25.7353C10.2941 23.4613 12.1377 21.6176 14.4118 21.6176H24.7059C24.7059 23.8916 22.8623 25.7353 20.5882 25.7353H10.2941Z"></path></svg>
+      GRADIOUS Admin  </div>
+  <h2>⚙️ Settings</h2>
+
+  <div class="setting">
+    <label for="theme">Choose Theme:</label>
+    <select id="theme">
+      <option value="light">Light</option>
+      <option value="dark">Dark</option>
+    </select>
+    <button onclick="applyTheme()">Apply Theme</button>
+  </div>
+
+  <div class="setting">
+    <label for="adminName">Set Admin Name:</label>
+    <input type="text" id="adminName" placeholder="Enter your name" />
+    <button onclick="saveAdminName()">Save Name</button>
+  </div>
+
+  <div class="setting">
+    <button style="background-color: red;" onclick="clearApplications()">❌ Clear All Applications</button>
+    <div id="status"></div>
+  </div>
+
+  <script>
+    // Load theme from localStorage
+    const currentTheme = localStorage.getItem('dashboardTheme') || 'light';
+    document.getElementById('theme').value = currentTheme;
+    applyTheme(currentTheme);
+
+    function applyTheme(theme = document.getElementById('theme').value) {
+      document.body.style.backgroundColor = theme === 'dark' ? '#222' : '#f9f9f9';
+      document.body.style.color = theme === 'dark' ? '#eee' : '#333';
+      localStorage.setItem('dashboardTheme', theme);
+    }
+
+    function saveAdminName() {
+      const name = document.getElementById('adminName').value.trim();
+      if (name) {
+        localStorage.setItem('adminName', name);
+        alert("Admin name saved!");
+      }
+    }
+
+    function clearApplications() {
+      if (confirm("Are you sure you want to delete all submitted applications?")) {
+        localStorage.removeItem('applications');
+        document.getElementById('status').textContent = "✅ All applications have been cleared.";
+      }
+    }
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admission Results ‑ Admission Portal</title>
+
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    body{
+      background-image: url('College.jpg');
+    }
+    .wrapper {
+      max-width: 500px; margin: 7rem auto;
+      background: rgba(255,255,255,0.95);
+      padding: 2rem 2.5rem; border-radius: 0.75rem;
+      box-shadow: 0 8px 18px rgba(0,0,0,0.14);
+      text-align:center;
+    }
+    .wrapper input {
+      width: 100%; padding: 0.6rem 0.8rem; margin-top: 0.6rem;
+      border: 1px solid #ccc; border-radius: 0.4rem;
+    }
+    .wrapper button {
+      margin-top: 1rem; padding: 0.65rem 1rem;
+      border: none; border-radius: 0.4rem; cursor: pointer;
+      font-weight: 600;
+    }
+    .status {
+      margin-top: 1.4rem; font-size: 1.1rem; font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <header class="navbar">
+  <div class="logo"><svg fill="none" width="10vh" height="5vh" viewBox="0 0 35 35" class="browserSupportLogo" xmlns="http://www.w3.org/2000/svg"><path fill="#F55533" fill-rule="evenodd" clip-rule="evenodd" d="M35 0H0V15.4412C0 23.1899 4.78063 30.1364 12.0191 32.905L17.5 35L22.9809 32.905C30.2194 30.1364 35 23.1899 35 15.4412V0ZM24.7059 12.3529C24.7059 16.3319 21.4797 19.5588 17.5 19.5588C13.5203 19.5588 10.2941 16.3319 10.2941 12.3529C10.2941 8.37402 13.5203 5.14706 17.5 5.14706H24.7059V12.3529ZM17.5 15.4412C19.2056 15.4412 20.5882 14.0579 20.5882 12.3529C20.5882 10.648 19.2056 9.26471 17.5 9.26471C15.7944 9.26471 14.4118 10.648 14.4118 12.3529C14.4118 14.0579 15.7944 15.4412 17.5 15.4412ZM10.2941 25.7353C10.2941 23.4613 12.1377 21.6176 14.4118 21.6176H24.7059C24.7059 23.8916 22.8623 25.7353 20.5882 25.7353H10.2941Z"></path></svg>
+      GRADIOUS COLLEGE OF ENGINEERING  </div>
+    
+        
+     <nav class="nav-links">
+      <a href="Home.html">Home</a>
+      <a href="ApplyNow.html">Apply Now</a>
+      <a href="Login.html">Login</a>
+      <a href="ContactUs.html">Contact Us</a>
+    </nav>
+  </header>
+  <div class="wrapper">
+    <h2>Check Your Seat Allotment</h2>
+    <form id="resultForm">
+      <label for="appId">Enter Application ID</label>
+      <input type="text" id="appId" required placeholder="e.g. APP2025‑1234" />
+      <button type="submit">View Result</button>
+    </form>
+
+    <p class="status" id="statusText"></p>
+  </div>
+
+  <script>
+document.getElementById("resultForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const appId = document.getElementById("appId").value.trim();
+  const display = document.getElementById("statusText");
+
+  if (!appId) {
+    display.textContent = "Please enter a valid Application ID.";
+    display.style.color = "crimson";
+    return;
+  }
+
+  try {
+    // Fetch the application data from backend
+    const res = await fetch(`http://localhost:5000/api/application/${appId}`);
+    if (res.status === 404) {
+      display.textContent = "Application ID not found. Please check again.";
+      display.style.color = "crimson";
+      return;
+    }
+
+    const app = await res.json();
+
+    // Show status based on 'status' field in DB
+    if (app.status === "Approved") {
+      display.textContent = `🎉 Congratulations! Your application is approved.`;
+      display.style.color = "green";
+    } else if (app.status === "Rejected") {
+      display.textContent = `❌ Sorry! Your application is rejected. Remarks: ${app.remarks || "N/A"}`;
+      display.style.color = "crimson";
+    } else {
+      display.textContent = "⏳ Your application is still pending. Please check again later.";
+      display.style.color = "orange";
+    }
+
+  } catch (err) {
+    console.error(err);
+    display.textContent = "⚠️ Server error. Please try again later.";
+    display.style.color = "crimson";
+  }
+});
+</script>
+
+</body>
+</html>

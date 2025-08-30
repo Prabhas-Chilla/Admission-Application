@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Application Form - CMR College Admission Portal</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background: #f4f7f8;
+  color: #333;
+}
+
+.navbar {
+  background-color: #004080;
+  color: white;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.nav-links a {
+  color: white;
+  margin-left: 20px;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.nav-links a:hover {
+  text-decoration: underline;
+}
+
+.main-content {
+  max-width: 600px;
+  margin: 3rem auto;
+  background: #ffffff;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.main-content h1 {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #004080;
+}
+
+.application-form .form-group {
+  margin-bottom: 1.5rem;
+}
+
+.application-form label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.application-form input,
+.application-form select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1rem;
+  transition: border-color 0.3s;
+}
+
+.application-form input:focus,
+.application-form select:focus {
+  border-color: #004080;
+  outline: none;
+}
+
+.portal-btn {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  background-color: #004080;
+  color: white;
+  font-size: 1.1rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.portal-btn:hover {
+  background-color: #003366;
+}
+  </style>
+</head>
+<body>
+  <header class="navbar">
+    <div class="logo"><svg fill="none" width="10vh" height="5vh" viewBox="0 0 35 35" class="browserSupportLogo" xmlns="http://www.w3.org/2000/svg"><path fill="#F55533" fill-rule="evenodd" clip-rule="evenodd" d="M35 0H0V15.4412C0 23.1899 4.78063 30.1364 12.0191 32.905L17.5 35L22.9809 32.905C30.2194 30.1364 35 23.1899 35 15.4412V0ZM24.7059 12.3529C24.7059 16.3319 21.4797 19.5588 17.5 19.5588C13.5203 19.5588 10.2941 16.3319 10.2941 12.3529C10.2941 8.37402 13.5203 5.14706 17.5 5.14706H24.7059V12.3529ZM17.5 15.4412C19.2056 15.4412 20.5882 14.0579 20.5882 12.3529C20.5882 10.648 19.2056 9.26471 17.5 9.26471C15.7944 9.26471 14.4118 10.648 14.4118 12.3529C14.4118 14.0579 15.7944 15.4412 17.5 15.4412ZM10.2941 25.7353C10.2941 23.4613 12.1377 21.6176 14.4118 21.6176H24.7059C24.7059 23.8916 22.8623 25.7353 20.5882 25.7353H10.2941Z"></path></svg>Gradious Institution</div>
+    <nav class="nav-links">
+      <a href="Home.html">Home</a>
+      <a href="ApplyNow.html">Apply Now</a>
+      <a href="Home.html">Logout</a>
+      <a href="ContactUs.html">Contact Us</a>
+    </nav>
+  </header>
+<!-- enctype="multipart/form-data" method="POST" action="/api/application/submit"> -->
+   
+  <main class="main-content">
+    <h1>Application Form</h1>
+     <form class="application-form" id="applicationForm" enctype="multipart/form-data">
+    <div class="form-group">
+        <label for="course">Select Course:</label>
+        <select id="course" name="course" required>
+          <option value="">--Select a Course--</option>
+          <option value="BTECH">B.tech</option>
+          <option value="MTECH">M.tech</option>
+          <option value="MBA">MBA</option>
+          <option value="BCOM">B.com</option>
+        </select>
+      </div>
+
+      <div class="form-group" id="branch-group">
+        <label for="branch">Select Branch:</label>
+        <select id="branch" name="branch" required>
+           <option value="">--Select Branch--</option>
+          <option value="CSE">CSE</option>
+          <option value="CSM">CSM</option>
+          <option value="ECE">ECE</option>
+          <option value="CIVIL">CIVIL</option>     
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="fullName">Full Name:</label>
+        <input type="text" id="fullName" name="fullName" required />
+      </div>
+
+      <div class="form-group">
+        <label for="fatherName">Father's Name:</label>
+        <input type="text" id="fatherName" name="fatherName" required />
+      </div>
+
+      <div class="form-group">
+        <label for="motherName">Mother's Name:</label>
+        <input type="text" id="motherName" name="motherName" required />
+      </div>
+
+      <div class="form-group">
+        <label for="aadhar">Aadhar Number:</label>
+        <input type="text" id="aadhar" name="aadhar" maxlength="12" required />
+      </div>
+
+      <div class="form-group">
+        <label for="emcetMarks">EAMCET RANK:</label>
+        <input type="text" id="emcetMarks" name="emcetMarks" required />
+      </div>
+
+      <div class="form-group">
+        <label for="tenthPercentage">10th Percentage:</label>
+        <input type="number" id="tenthPercentage" name="tenthPercentage" min="0" max="100" step="0.01" required />
+      </div>
+
+      <div class="form-group">
+        <label for="interPercentage">Intermediate Percentage:</label>
+        <input type="number" id="interPercentage" name="interPercentage" min="0" max="100" step="0.01" required />
+      </div>
+
+      <div class="form-group">
+        <label for="dob">Date of Birth:</label>
+        <input type="date" id="dob" name="dob" required />
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required />
+      </div>
+
+      <div class="form-group">
+        <label for="phone">Phone Number:</label>
+        <input type="tel" id="phone" name="phone" maxlength="10" required />
+      </div>
+  <div class="form-group">
+    <label for="photo">Upload Photo:</label>
+    <input type="file" id="photo" name="photo" accept="image/*" required />
+  </div>
+
+  <div class="form-group">
+    <label for="signature">Upload Signature:</label>
+    <input type="file" id="signature" name="signature" accept="image/*" required />
+  </div>
+
+      <button type="submit" class="portal-btn">Submit Application</button>
+    </form>
+  </main>
+
+  <script src="js/application.js"></script>
+</body>
+</html>

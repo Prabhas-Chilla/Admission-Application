@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>View Applications</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f7f8;
+      padding: 2rem;
+    }
+    h1 {
+      text-align: center;
+      color: #004080;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 2rem;
+    }
+    th, td {
+      padding: 12px;
+      border: 1px solid #ccc;
+      text-align: left;
+    }
+    th {
+      background-color: #004080;
+      color: white;
+    }
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+    img {
+      max-height: 50px;
+      border-radius: 4px;
+    }
+    .remarks-box {
+      margin-top: 10px;
+      display: none;
+    }
+    .remarks-box textarea {
+      width: 100%;
+      height: 60px;
+      margin-bottom: 5px;
+    }
+    .btn {
+      margin-right: 5px;
+      padding: 5px 10px;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    .approve {
+      background-color: #4CAF50;
+      color: white;
+    }
+    .reject {
+      background-color: #f44336;
+      color: white;
+    }
+    .submit {
+      background-color: #004080;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <h1>Submitted Applications</h1>
+  <p style="text-align:left; margin-top:2rem;">
+    <a href="AdminDashboard.html">← Back to AdminDashboard</a>
+  </p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>App ID</th>
+        <th>Time</th>
+        <th>Full Name</th>
+        <th>Course</th>
+        <th>Branch</th>
+        <th>Phone</th>
+        <th>EMCET RANK</th>
+        <th>10th %</th>
+        <th>Inter %</th>
+        <th>Photo</th>
+        <th>Signature</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody id="appTableBody"></tbody>
+  </table>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const tbody = document.getElementById('appTableBody');
+
+      fetch('http://localhost:5000/api/application') // Adjust this URL if needed
+        .then(response => response.json())
+        .then(applications => {
+          applications.forEach((app, index) => {
+            const row = document.createElement('tr');
+
+            const appId = app.applicationId; // ✅ use the real AppId from DB
+
+            // const createdTime = app.createdAt ? new Date(app.submittedAt).toLocaleString() : 'N/A';
+            const createdTime = app.submittedAt 
+  ? new Date(app.submittedAt).toLocaleString('en-GB', { 
+      day: '2-digit', month: '2-digit', year: 'numeric', 
+      hour: '2-digit', minute: '2-digit' 
+    }) 
+  : 'N/A';
+
+
+           row.innerHTML = `
+  <td>${escapeHtml(appId)}</td>
+  <td>${createdTime}</td>
+  <td>${escapeHtml(app.fullName)}</td>
+  <td>${escapeHtml(app.course)}</td>
+  <td>${escapeHtml(app.branch)}</td>
+  <td>${escapeHtml(app.phone)}</td>
+  <td>${escapeHtml(app.emcetMarks) || 'N/A'}</td>
+  <td>${escapeHtml(app.tenthPercentage)}%</td>
+  <td>${escapeHtml(app.interPercentage)}%</td>
+  <td>${app.photo ? `<img src="/uploads/${app.photo}" alt="Photo">` : 'N/A'}</td>
+  <td>${app.signature ? `<img src="/uploads/${app.signature}" alt="Sign">` : 'N/A'}</td>
+`;
+
+            const actionTd = document.createElement('td');
+
+            const approveBtn = document.createElement('button');
+            approveBtn.className = 'btn approve';
+            approveBtn.textContent = 'Approve';
+
+            const rejectBtn = document.createElement('button');
+            rejectBtn.className = 'btn reject';
+            rejectBtn.textContent = 'Reject';
+
+            const remarksDiv = document.createElement('div');
+            remarksDiv.className = 'remarks-box';
+
+            const textarea = document.createElement('textarea');
+            const submitBtn = document.createElement('button');
+            submitBtn.className = 'btn submit';
+            submitBtn.textContent = 'Submit';
+
+            remarksDiv.appendChild(textarea);
+            remarksDiv.appendChild(submitBtn);
+
+           approveBtn.onclick = () => {
+  remarksDiv.style.display = 'block';
+  submitBtn.onclick = async () => {
+    const remarkText = textarea.value;
+    try {
+      const res = await fetch(`http://localhost:5000/api/application/update-status/${appId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'Approved', remarks: remarkText })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        alert(data.message);
+        remarksDiv.style.display = 'none';
+      } else {
+        alert(data.message || 'Failed to update status');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Server error while updating status');
+    }
+  };
+};
+
+
+           rejectBtn.onclick = () => {
+  remarksDiv.style.display = 'block';
+  submitBtn.onclick = async () => {
+    const remarkText = textarea.value;
+    try {
+      const res = await fetch(`http://localhost:5000/api/application/update-status/${appId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'Rejected', remarks: remarkText })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        alert(data.message);
+        remarksDiv.style.display = 'none';
+      } else {
+        alert(data.message || 'Failed to update status');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Server error while updating status');
+    }
+  };
+};
+
+
+            actionTd.appendChild(approveBtn);
+            actionTd.appendChild(rejectBtn);
+            actionTd.appendChild(remarksDiv);
+            row.appendChild(actionTd);
+
+            tbody.appendChild(row);
+          });
+        })
+        .catch(err => console.error('Failed to fetch applications', err));
+    });
+
+    function escapeHtml(text) {
+      if (!text) return '';
+      return text.toString().replace(/[&<>"']/g, function (m) {
+        return ({
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#039;'
+        })[m];
+      });
+    }
+  </script>
+</body>
+</html>
