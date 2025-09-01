@@ -5,33 +5,12 @@
   <title>Analytics - Admission Dashboard</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-    }
-    h2 {
-      color: #333;
-    }
-    .card {
-      background-color: #f5f5f5;
-      border-radius: 8px;
-      padding: 15px;
-      margin-bottom: 20px;
-    }
-    #chartContainer {
-      max-width: 600px;
-      margin: auto;
-    }
-    .logo {
-      display: flex;
-      align-items: center;
-      font-size: 20px;
-      font-weight: bold;
-      margin-bottom: 20px;
-    }
-    .logo svg {
-      margin-right: 10px;
-    }
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    h2 { color: #333; }
+    .card { background-color: #f5f5f5; border-radius: 8px; padding: 15px; margin-bottom: 20px; }
+    #chartContainer { max-width: 600px; margin: auto; }
+    .logo { display: flex; align-items: center; font-size: 20px; font-weight: bold; margin-bottom: 20px; }
+    .logo svg { margin-right: 10px; }
   </style>
 </head>
 <body>
@@ -47,7 +26,6 @@
 
   <div class="card">
     <strong>Total Applications:</strong> <span id="totalApps">0</span><br>
-    <!-- <strong>Today's Applications:</strong> <span id="todayApps">0</span><br> -->
     <strong>Most Chosen Course:</strong> <span id="topCourse">-</span>
   </div>
 
@@ -56,28 +34,57 @@
   </div>
 
   <script>
-async function fetchAnalytics() {
-  try {
-    const res = await fetch('http://localhost:5000/api/application/analytics-data');
-    const data = await res.json();
+  function loadAnalyticsFromLocalStorage() {
+    const approvedApps = JSON.parse(localStorage.getItem('approvedApplications') || '[]');
 
     // Total Applications
-    document.getElementById("totalApps").textContent = data.totalApplications;
+    const totalApps = approvedApps.length;
+    document.getElementById('totalApps').textContent = totalApps;
 
     // Most Chosen Course
-    const topCourse = Object.keys(data.courseCount).reduce((a, b) =>
-      data.courseCount[a] > data.courseCount[b] ? a : b, "-"
-    );
-    document.getElementById("topCourse").textContent = topCourse;
+    const courseCount = {};
+    approvedApps.forEach(app => {
+      if(app.course) {
+        courseCount[app.course] = (courseCount[app.course] || 0) + 1;
+      }
+    });
 
-    // Weekly Applications Chart
+    const topCourse = Object.keys(courseCount).length
+      ? Object.keys(courseCount).reduce((a, b) => courseCount[a] > courseCount[b] ? a : b)
+      : '-';
+    document.getElementById('topCourse').textContent = topCourse;
+
+    // Weekly chart (optional, using submission date)
+    const last7Days = [];
+    const chartData = [];
+
+    // Initialize last 7 days
+    for(let i=6;i>=0;i--){
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const dayName = d.toLocaleDateString('en-US', { weekday: 'short' });
+      last7Days.push(dayName);
+      chartData.push(0);
+    }
+
+    approvedApps.forEach(app => {
+      if(app.submittedAt){
+        const appDate = new Date(app.submittedAt);
+        const today = new Date();
+        const diff = Math.floor((today - appDate) / (1000*60*60*24));
+        if(diff >= 0 && diff < 7){
+          chartData[6 - diff] += 1;
+        }
+      }
+    });
+
     new Chart(document.getElementById("weeklyChart"), {
       type: 'bar',
       data: {
-        labels: data.last7Days,
+        labels: last7Days,
         datasets: [{
           label: 'Applications per Day',
-          data: data.chartData,
+          data: chartData,
           backgroundColor: '#3e95cd'
         }]
       },
@@ -85,19 +92,15 @@ async function fetchAnalytics() {
         responsive: true,
         plugins: {
           legend: { display: false },
-          title: {
-            display: true,
-            text: 'Applications Over the Last 7 Days'
-          }
+          title: { display: true, text: 'Applications Over the Last 7 Days' }
         }
       }
     });
-
-  } catch (err) {
-    console.error('Error fetching analytics:', err);
   }
-}
 
-// Load analytics on page load
-fetchAnalytics();
+  loadAnalyticsFromLocalStorage();
 </script>
+
+ 
+</body>
+</html>
