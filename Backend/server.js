@@ -20,6 +20,9 @@ app.use(bodyParser.json());
 
 // Serve static files from 'public'
 app.use(express.static(path.join(__dirname, 'public')));
+app.get('/',(req,res)=>{
+  res.redirect('Home.html');
+})
 
 // Serve signup.html for /signup route
 app.get('/signup', (req, res) => {
