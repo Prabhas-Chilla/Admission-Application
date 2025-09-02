@@ -5,6 +5,7 @@ const User = require('../models/User');
 // Signup
 router.post('/signup', async (req, res) => {
   const { email, password } = req.body;
+  console.log(email, password);
   try {
     const userExists = await User.findOne({ email });
     if (userExists) return res.status(400).json({ message: 'User already exists' });
@@ -21,6 +22,7 @@ router.post('/signup', async (req, res) => {
 // Login
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
+  console.log(email, password);
   try {
     const user = await User.findOne({ email });
     if (!user || user.password !== password) {
@@ -34,6 +36,7 @@ router.post('/login', async (req, res) => {
 
 router.post('/admin-login', (req, res) => {
   const { email, password } = req.body;
+  console.log(email, password);
   const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
   const ADMIN_PASS = process.env.ADMIN_PASS;
 
