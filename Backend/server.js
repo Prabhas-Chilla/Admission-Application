@@ -8,6 +8,8 @@ const path = require('path');
 const authRoutes = require('./routes/auth');
 const applicationRoutes = require('./routes/application');
 const uploadsDir = path.join(__dirname, '../public/uploads');
+const MONGO_URI= "mongodb+srv://prabhachilla056:5WmRTT9nL4beAbIQ@cluster0.iibpz4r.mongodb.net/admission"
+
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
@@ -42,7 +44,7 @@ app.get('/analytics', (req,res) => {
   res.sendFile(path.join(__dirname, '../public/Analytics.html'));
 });
 
-mongoose.connect(process.env.MONGO_URI)
+mongoose.connect(MONGO_URI)
   .then(() => console.log('MongoDB connected'))
   .catch(err => console.log(err));
 
