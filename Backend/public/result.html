@@ -69,7 +69,7 @@ document.getElementById("resultForm").addEventListener("submit", async e => {
 
   try {
     // Fetch the application data from backend
-    const res = await fetch(`http://localhost:5000/api/application/${appId}`);
+    const res = await fetch(`/api/application/${appId}`);
     if (res.status === 404) {
       display.textContent = "Application ID not found. Please check again.";
       display.style.color = "crimson";
