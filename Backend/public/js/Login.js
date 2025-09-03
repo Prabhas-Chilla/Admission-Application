@@ -1,7 +1,7 @@
 // Detect if running locally or on Render
 const API_BASE = window.location.hostname === "localhost"
   ? "http://localhost:5000"
-  : "https://admission-application-gradious.onrender.com";
+  : window.location.origin;
 
 // Select the login form and add submit event listener
 document.querySelector('.login-form').addEventListener('submit', async (e) => {
