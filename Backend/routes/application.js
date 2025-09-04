@@ -7,8 +7,6 @@ const fs = require('fs');
 const PDFDocument = require('pdfkit');
 const getNextAppId = require('../utils/generateAppId');
 
-// ------------------ Multer Setup ------------------
-
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, path.join(__dirname, '../public/uploads'));
@@ -21,22 +19,18 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-// ------------------ POST Upload ------------------
 router.post('/upload', upload.fields([
   { name: 'photo', maxCount: 1 },
   { name: 'signature', maxCount: 1 }
 ]), async (req, res) => {
   try {
-    // Check duplicate Aadhar
+
     const existAadhar = await Application.findOne({ aadhar: req.body.aadhar });
     if (existAadhar) {
       return res.status(400).json({ message: 'Aadhar Number Already Exists' });
     }
-
-    // Generate application ID
     const newAppId = await getNextAppId();
 
-    // Save new application
     const newApp = new Application({
       applicationId: newAppId,
       ...req.body,
@@ -44,18 +38,14 @@ router.post('/upload', upload.fields([
       signature: req.files?.signature?.[0]?.filename || ''
     });
     await newApp.save();
-
-    // Ensure PDF folder exists
     const pdfDir = path.join(__dirname, '../public/pdfs');
     if (!fs.existsSync(pdfDir)) fs.mkdirSync(pdfDir);
 
-    // Generate PDF
     const pdfPath = path.join(pdfDir, `${newAppId}.pdf`);
     const doc = new PDFDocument({ size: 'A4', margin: 50 });
 
     doc.pipe(fs.createWriteStream(pdfPath));
 
-    // Title
     doc.font('Helvetica-Bold')
        .fontSize(22)
        .fillColor('#004080')
@@ -63,7 +53,6 @@ router.post('/upload', upload.fields([
 
     doc.moveDown(1.5);
 
-    // Applicant Info
     doc.font('Helvetica')
        .fontSize(12)
        .fillColor('black')
@@ -135,7 +124,6 @@ router.get('/:appId', async (req, res) => {
   }
 });
 
-// ------------------ Update status and remarks ------------------
 router.put('/update-status/:appId', async (req, res) => {
   try {
     const { appId } = req.params;
@@ -159,18 +147,17 @@ router.put('/update-status/:appId', async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 });
-// GET Analytics Data
+
 router.get('/analytics-data', async (req, res) => {
   try {
     const applications = await Application.find({}, 'course submittedAt'); // fetch only needed fields
 
-    // Count applications per course
+  
     const courseCount = {};
     applications.forEach(app => {
       if (app.course) courseCount[app.course] = (courseCount[app.course] || 0) + 1;
     });
 
-    // Weekly applications (last 7 days)
     const last7Days = [...Array(7)].map((_, i) => {
       const date = new Date();
       date.setDate(date.getDate() - i);
