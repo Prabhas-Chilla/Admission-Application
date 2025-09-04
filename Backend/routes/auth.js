@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
 const bcrypt = require('bcrypt');
-const { UnableToSetCookieError } = require('selenium-webdriver/lib/error');
+
 
 router.post('/signup', async (req, res) => {
   const { email, password } = req.body;
