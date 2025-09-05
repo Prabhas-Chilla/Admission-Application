@@ -8,6 +8,7 @@ const path = require('path');
 const authRoutes = require('./routes/auth');
 const applicationRoutes = require('./routes/application');
 const uploadsDir = path.join(__dirname, '../public/uploads');
+ 
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
@@ -18,13 +19,11 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
-// Serve static files from 'public'
 app.use(express.static(path.join(__dirname, 'public')));
 app.get('/',(req,res)=>{
   res.redirect('Home.html');
 })
 
-// Serve signup.html for /signup route
 app.get('/signup', (req, res) => {
   res.sendFile(path.join(__dirname, '../public/signup.html'));
 });
@@ -46,7 +45,6 @@ mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('MongoDB connected'))
   .catch(err => console.log(err));
 
-// API routes
 app.use('/api/auth', authRoutes);
 app.use('/api/application', applicationRoutes);
 

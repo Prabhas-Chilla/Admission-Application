@@ -24,11 +24,11 @@ router.post('/upload', upload.fields([
   { name: 'signature', maxCount: 1 }
 ]), async (req, res) => {
   try {
-
     const existAadhar = await Application.findOne({ aadhar: req.body.aadhar });
     if (existAadhar) {
       return res.status(400).json({ message: 'Aadhar Number Already Exists' });
     }
+
     const newAppId = await getNextAppId();
 
     const newApp = new Application({
@@ -38,13 +38,12 @@ router.post('/upload', upload.fields([
       signature: req.files?.signature?.[0]?.filename || ''
     });
     await newApp.save();
-    const pdfDir = path.join(__dirname, '../public/pdfs');
-    if (!fs.existsSync(pdfDir)) fs.mkdirSync(pdfDir);
 
-    const pdfPath = path.join(pdfDir, `${newAppId}.pdf`);
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `inline; filename="${newAppId}.pdf"`);
+
     const doc = new PDFDocument({ size: 'A4', margin: 50 });
-
-    doc.pipe(fs.createWriteStream(pdfPath));
+    doc.pipe(res);
 
     doc.font('Helvetica-Bold')
        .fontSize(22)
@@ -72,7 +71,6 @@ router.post('/upload', upload.fields([
 
     doc.moveDown(1);
 
-   
     if (newApp.photo) {
       doc.text('Photo:');
       doc.image(path.join(__dirname, '../public/uploads', newApp.photo), { width: 100 });
@@ -86,17 +84,12 @@ router.post('/upload', upload.fields([
 
     doc.end();
 
-   
-    res.status(201).json({
-      message: 'Application submitted successfully',
-      pdfUrl: `/pdfs/${newAppId}.pdf` 
-    });
-
   } catch (err) {
     console.error('Error submitting application:', err);
     res.status(500).json({ message: 'Submission failed' });
   }
 });
+
 
 router.get('/', async (req, res) => {
   try {
